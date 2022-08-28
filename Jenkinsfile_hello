@@ -12,6 +12,7 @@ pipeline {
 
     parameters {
          booleanParam defaultValue:false,name:'blCreateIAMRole'
+         booleanParam defaultValue:false,name:'blCreateLambda'
          booleanParam defaultValue:false,name:'blDeleteLambda'
     }       
 
@@ -36,6 +37,7 @@ pipeline {
             }
         }
         stage('Create Lambda') {
+            when { expression{ return params.blCreateLambda } }
             steps{
                 echo 'Create a deployment package && Create a Lambda function' 
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
