@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+
+    environment {
+        lambdaRole      = "lambda-ex"
+        lambdaName      = "hello-world-python"
+        lambdaHander    = "lambda_function.lambda_handler"
+        lambdaRuntime   = "pythone3.9"
+        accountID       = "402117963536"
+    }
+
+    parameters {
+         booleanParam 'blCreateIAMRole'
+         booleanParam 'blDeleteLambda'
+    }       
+
+    stages {
+        stage('Create Role') {
+            when { expression{ return blCreateIAMRole } }
+            steps {
+                withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
+                    // Create Lambda role
+                    sh '''
+                        aws iam create-role \
+                        --role-name $lambdaRole \
+                        --assume-role-policy-document file://trust-policy.json
+                    '''
+                    //  Attach AWSLambdaBasicExecutionRole policy to role
+                    sh """
+                        aws iam attach-role-policy \
+                        --role-name ${lambdaRole} \
+                        --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                    """
+                }
+            }
+        }
+        stage('Create Lambda') {
+            steps{
+                echo 'Create a deployment package && Create a Lambda function' 
+                withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
+                    sh '''
+                        zip function.zip $lambdaName
+                       
+                       aws lambda create-function --function-name $lambdaName \
+                        --zip-file fileb://function.zip --handler $lambdaHandler --runtime $lambdaRuntime \
+                        --role arn:aws:iam::$accountID:role/$lambdaRole
+                    '''
+                    
+                    echo 'List lambda functions'
+                    sh 'aws lambda list-functions --max-items 10'
+                    sh 'aws lambda get-function --function-name $lambdaName'
+
+                    echo 'Invoke test'
+                    sh 'aws lambda invoke --function-name my-function out --log-type Tail'
+                }
+            }
+        }
+        stage('Delete Lambda'){
+            when { expression{ return blDeleteLambda } }
+            steps{
+                withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
+                    ehco 'Deleting lambda $lambdaName'
+                    sh 'aws lambda delete-function --function-name $lambdaName'
+                }             
+            }
+        }
+    }
+
+    post {
+        always {
+            // One or more steps need to be included within each condition's block.
+            cleanWs()
+        }
+    }
+}
