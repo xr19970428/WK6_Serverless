@@ -13,7 +13,9 @@ pipeline {
     parameters {
          booleanParam defaultValue:false,name:'blCreateIAMRole'
          booleanParam defaultValue:false,name:'blCreateLambda'
+         booleanParam defaultValue:false,name:'blTestLambda'
          booleanParam defaultValue:false,name:'blDeleteLambda'
+
     }       
 
     stages {
@@ -47,11 +49,13 @@ pipeline {
                        aws lambda create-function --function-name $lambdaName \
                         --zip-file fileb://function.zip --handler $lambdaHandler --runtime $lambdaRuntime \
                         --role arn:aws:iam::$accountID:role/$lambdaRole
+
                     '''
                 }
             }
         }
         stage('Test Lambda') {
+            when { expression{ return params.blTestLambda } }
             steps{
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
                     echo 'List lambda functions'
