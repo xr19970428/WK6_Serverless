@@ -5,7 +5,7 @@ pipeline {
         lambdaRole      = "lambda-ex"
         lambdaName      = "hello-world-python"
         lambdaFileName  = "lambda_function.py"
-        lambdaHander    = "lambda_function.lambda_handler"
+        lambdaHandler    = "lambda_function.lambda_handler"
         lambdaRuntime   = "pythone3.9"
         accountID       = "402117963536"
     }
