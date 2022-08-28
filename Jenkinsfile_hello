@@ -38,6 +38,16 @@ pipeline {
                 }
             }
         }
+        stage('Wait Role Creation' {
+            steps{
+                echo "Waiting for ${lambdaRole} Creation"
+                script {
+                    timeout(time: 10, unit: 'SECONDS') {
+                            input "Should we continue to create lambda?"
+                    }
+                }
+            }
+        }
         stage('Create Lambda') {
             when { expression{ return params.blCreateLambda } }
             steps{
