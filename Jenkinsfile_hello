@@ -60,6 +60,10 @@ pipeline {
 
                     echo 'Invoke test'
                     sh 'aws lambda invoke --function-name $lambdaName out --log-type Tail'
+                    sh '''
+                        aws lambda invoke --function-name $lambdaName out --log-type Tail \
+                        --query 'LogResult' --output text |  base64 -d
+                    '''
                 } 
             }
         }
