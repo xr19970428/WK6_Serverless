@@ -10,8 +10,8 @@ pipeline {
     }
 
     parameters {
-         booleanParam defaultValue:false,'blCreateIAMRole'
-         booleanParam defaultValue:false,'blDeleteLambda'
+         booleanParam defaultValue:false,name:'blCreateIAMRole'
+         booleanParam defaultValue:false,name:'blDeleteLambda'
     }       
 
     stages {
