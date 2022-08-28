@@ -78,7 +78,7 @@ pipeline {
                     sh 'aws lambda invoke --function-name $lambdaName out --log-type Tail'
                     sh '''
                         aws lambda invoke --function-name $lambdaName out --log-type Tail \
-                        --query 'LogResult' --output text |  base64 -d
+                        --query 'LogResult' --payload '{\r\n  \"queryStringParameters\": {\r\n    \"name\": \"Will\",\r\n    \"city\": \"Gold Coast\",\r\n}'--output text |  base64 -d
                     '''
                 } 
             }
