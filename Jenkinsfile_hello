@@ -52,7 +52,7 @@ pipeline {
                     sh 'aws lambda get-function --function-name $lambdaName'
 
                     echo 'Invoke test'
-                    sh 'aws lambda invoke --function-name my-function out --log-type Tail'
+                    sh 'aws lambda invoke --function-name $lambdaName out --log-type Tail'
                 }
             }
         }
