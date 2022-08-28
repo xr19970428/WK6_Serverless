@@ -53,13 +53,14 @@ pipeline {
         }
         stage('Test Lambda') {
             steps{
-                echo 'List lambda functions'
-                sh 'aws lambda list-functions --max-items 10'
-                sh 'aws lambda get-function --function-name $lambdaName'
+                withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
+                    echo 'List lambda functions'
+                    sh 'aws lambda list-functions --max-items 10'
+                    sh 'aws lambda get-function --function-name $lambdaName'
 
-                echo 'Invoke test'
-                sh 'aws lambda invoke --function-name $lambdaName out --log-type Tail'
-                
+                    echo 'Invoke test'
+                    sh 'aws lambda invoke --function-name $lambdaName out --log-type Tail'
+                } 
             }
         }
         stage('Delete Lambda'){
