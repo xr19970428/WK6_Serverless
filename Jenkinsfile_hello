@@ -78,9 +78,10 @@ pipeline {
                     echo "Deleting lambda $lambdaName and role $lambdaRole"
                     sh 'aws lambda delete-function --function-name $lambdaName'
                     sh """
-                        aws iam attach-role-policy \
+                        aws iam detach-role-policy \
                             --role-name ${lambdaRole} \
                             --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                        sleep
                         aws iam delete-role --role-name ${lambdaRole}
                     """
                 }
