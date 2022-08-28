@@ -71,7 +71,7 @@ pipeline {
             when { expression{ return params.blDeleteLambda } }
             steps{
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
-                    echo Deleting lambda $lambdaName and role $lambdaRole
+                    echo "Deleting lambda $lambdaName and role $lambdaRole"
                     sh 'aws lambda delete-function --function-name $lambdaName'
                     sh 'aws iam delete-role --role-name $lambdaRole'
                 }             
