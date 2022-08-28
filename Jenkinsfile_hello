@@ -62,7 +62,7 @@ pipeline {
             when { expression{ return params.blDeleteLambda } }
             steps{
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
-                    ehco 'Deleting lambda $lambdaName'
+                    echo 'Deleting lambda $lambdaName'
                     sh 'aws lambda delete-function --function-name $lambdaName'
                 }             
             }
