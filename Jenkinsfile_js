@@ -149,8 +149,12 @@ pipeline {
                         aws iam detach-role-policy \
                             --role-name ${lambdaRole} \
                             --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                        aws iam detach-role-policy \\
+                            --role-name ${lambdaRole} \\
+                            --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
                         aws iam delete-role --role-name ${lambdaRole}
                     """
+                    echo "Deleting dynamoDB"
                     sh  'aws dynamodb delete-table --table-name $dynamoTable'
                 }
             }
