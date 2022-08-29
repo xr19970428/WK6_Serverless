@@ -133,18 +133,18 @@ pipeline {
                         --key-schema AttributeName=id,KeyType=HASH AttributeName=name,KeyType=RANGE \
                         --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
                         --local-secondary-indexes \
-                        "[
-                            {                                                                                                
-                                \"IndexName\": \"HelloIndex\",                              
-                                \"KeySchema\": [                                                          
-                                    {\"AttributeName\": \"id\",\"KeyType\":\"HASH\"},
-                                    {\"AttributeName\": \"name\\",\"KeyType\":\"RANGE\"}
-                                ],                                                                                      
-                                \"Projection\": {                                                        
-                                    \"ProjectionType\": \"ALL\"                            
-                                }                                                                                        
-                            }                                                                                                
-                        ]"
+                            "[
+                                {                                                                                                
+                                    \\"IndexName\\": \\"HelloIndex\\",                              
+                                    \\"KeySchema\\": [                                                          
+                                        {\\"AttributeName\\": \\"id\\",\\"KeyType\\":\\"HASH\\"},
+                                        {\\"AttributeName\\": \\"name\\",\\"KeyType\\":\\"RANGE\\"}
+                                    ],                                                                                      
+                                    \\"Projection\\": {                                                        
+                                        \\"ProjectionType\\": \\"ALL\\"                            
+                                    }                                                                                        
+                                }                                                                                                
+                            ]"
                     '''
                 }
             }
