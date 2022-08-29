@@ -1,20 +1,27 @@
+'use strict';
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'ap-southeast-2'})
 
-
 // Create the DynamoDB service object
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-'use strict';
 console.log('Loading hello world function');
 
 
 exports.handler = async (event) => {
+
     let name = "you";
     let city = 'World';
     let time = 'day';
     let day = '';
     let responseCode = 200;
+    let response = {
+        statusCode: responseCode,
+        body: undefined,
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }
     console.log("request: " + JSON.stringify(event));
 
     /*    if (event.queryStringParameters && event.queryStringParameters.name) {
@@ -38,13 +45,19 @@ exports.handler = async (event) => {
         let body = JSON.parse(event.body)
         if (body.name)
             name = body.name;
-        else
-            throw Error ('Missing name')
+        else {
+            response.statusCode = 400
+            response.body = "Missing name"
+            return response
+        }
 
         if (body.city)
             city = body.city;
-        else
-            throw Error ('Missing city')
+        else {
+            response.statusCode = 400
+            response.body = "Missing city"
+            return response
+        }
 
         if (body.day)
             day = body.day;
@@ -74,16 +87,11 @@ exports.handler = async (event) => {
     // ones. The 'body' property  must be a JSON string. For
     // base64-encoded payload, you must also set the 'isBase64Encoded'
     // property to 'true'.
-    let response = {
-        statusCode: responseCode,
-        headers: {
-            "x-custom-header" : "my custom header value"
-        },
-        body: JSON.stringify(responseBody)
-    };
+    response.body = JSON.stringify(responseBody)
+
     console.log("response: " + JSON.stringify(response))
 
-    let params = {
+        let params = {
         TableName: 'HelloWorldTable',
         Item: {
             'id': {N: new Date().valueOf().toString()},
