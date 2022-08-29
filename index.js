@@ -52,6 +52,5 @@ exports.handler = async (event) => {
         body: JSON.stringify(responseBody)
     };
     console.log("response: " + JSON.stringify(response))
-
     return response;
 };
