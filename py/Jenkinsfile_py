@@ -24,17 +24,20 @@ pipeline {
             steps {
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
                     // Create Lambda role
-                    sh '''
-                        aws iam create-role \
-                        --role-name $lambdaRole \
-                        --assume-role-policy-document file://trust-policy.json
-                    '''
-                    //  Attach AWSLambdaBasicExecutionRole policy to role
-                    sh """
-                        aws iam attach-role-policy \
-                        --role-name ${lambdaRole} \
-                        --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-                    """
+                    dir('py'){
+                        sh '''
+                            aws iam create-role \
+                            --role-name $lambdaRole \
+                            --assume-role-policy-document file://trust-policy.json
+                        '''
+                            //  Attach AWSLambdaBasicExecutionRole policy to role
+                            sh """
+                            aws iam attach-role-policy \
+                            --role-name ${lambdaRole} \
+                            --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                        """
+                    }
+
                 }
             }
         }
@@ -55,14 +58,16 @@ pipeline {
             steps{
                 echo 'Create a deployment package && Create a Lambda function' 
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
-                    sh '''
-                       zip function.zip $lambdaFileName
-                       
-                       aws lambda create-function --function-name $lambdaName \
-                        --zip-file fileb://function.zip --handler $lambdaHandler --runtime $lambdaRuntime \
-                        --role arn:aws:iam::$accountID:role/$lambdaRole
+                    dir('py'){
+                        sh '''
+                           zip function.zip $lambdaFileName
+                           
+                           aws lambda create-function --function-name $lambdaName \
+                            --zip-file fileb://function.zip --handler $lambdaHandler --runtime $lambdaRuntime \
+                            --role arn:aws:iam::$accountID:role/$lambdaRole
+                        '''
+                    }
 
-                    '''
                 }
             }
         }
