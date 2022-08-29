@@ -9,11 +9,13 @@ pipeline {
         newHandler      = "index_dynamodb.handler"
         lambdaRuntime   = "nodejs16.x"
         accountID       = "402117963536"
+        dynamoTable     = "HelloWorldTable"
     }
 
     parameters {
          booleanParam defaultValue:false,name:'blCreateIAMRole'
          booleanParam defaultValue:false,name:'blCreateLambda'
+        booleanParam defaultValue:false,name:'blCreateDynamo'
          booleanParam defaultValue:false,name:'blUpdateLambdaCode'
          booleanParam defaultValue:false,name:'blUpdateLambdaConf'
          booleanParam defaultValue:false,name:'blTestLambda'
@@ -96,7 +98,6 @@ pipeline {
                 }
             }
         }
-
         stage('Test Lambda') {
             when { expression{ return params.blTestLambda } }
             steps{
@@ -116,6 +117,22 @@ pipeline {
                 } 
             }
         }
+
+        stage('Create DynamoDB') {
+            when { expression{ return params.blCreateDynamo } }
+            steps{
+                echo 'Create a DynamoDB'
+                withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
+                    sh '''
+                       aws dynamodb create-table --table-name $dynamoTable \
+                        --attribute-definitions AttributeName=name,AttributeType=S \
+                        --key-schema AttributeName=name,KeyType=HASH \
+                        --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+                    '''
+                }
+            }
+        }
+
         stage('Delete Resources'){
             when { expression{ return params.blDeleteLambda } }
             steps{
@@ -128,6 +145,7 @@ pipeline {
                             --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
                         aws iam delete-role --role-name ${lambdaRole}
                     """
+                    sh  'aws dynamodb delete-table --table-name $dynamoTable'
                 }
             }
         }
