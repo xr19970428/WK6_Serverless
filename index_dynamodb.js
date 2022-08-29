@@ -1,5 +1,12 @@
 'use strict';
 console.log('Loading hello world function');
+// Load the AWS SDK for Node.js
+var AWS = require('aws-sdk');
+AWS.config.update({region: 'ap-southeast-2'})
+
+
+// Create the DynamoDB service object
+var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 exports.handler = async (event) => {
     let name = "you";
@@ -53,5 +60,20 @@ exports.handler = async (event) => {
     };
     console.log("response: " + JSON.stringify(response))
 
+    let params = {
+        TableName: 'HelloWorldTable',
+        Item: {
+            'name' : {S: name},
+            'city' : {S: city}
+        }
+    };
+    let ddbResponse = await ddb.putItem(params, function(err, data) {
+        if (err) {
+            console.log("Error", err);
+        } else {
+            console.log("Success", data);
+        }
+    }).promise();
+    console.log('ddbResponse', ddbResponse)
     return response;
 };

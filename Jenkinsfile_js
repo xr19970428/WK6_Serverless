@@ -6,6 +6,7 @@ pipeline {
         lambdaName      = "GetStartedLambdaProxyIntegration"
         lambdaFileName  = "*.js"
         lambdaHandler   = "index.handler"
+        newHandler      = "index_dynamodb.handler"
         lambdaRuntime   = "nodejs16.x"
         accountID       = "402117963536"
     }
@@ -13,7 +14,8 @@ pipeline {
     parameters {
          booleanParam defaultValue:false,name:'blCreateIAMRole'
          booleanParam defaultValue:false,name:'blCreateLambda'
-         booleanParam defaultValue:false,name:'blUpdateLambda'
+         booleanParam defaultValue:false,name:'blUpdateLambdaCode'
+         booleanParam defaultValue:false,name:'blUpdateLambdaConf'
          booleanParam defaultValue:false,name:'blTestLambda'
          booleanParam defaultValue:false,name:'blDeleteLambda'
     }
@@ -67,8 +69,8 @@ pipeline {
                 }
             }
         }
-        stage('Update Lambda') {
-            when { expression{ return params.blUpdateLambda } }
+        stage('Update Lambda Code') {
+            when { expression{ return params.blUpdateLambdaCode } }
             steps{
                 echo 'Create a deployment package && Update the Lambda function'
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
@@ -81,6 +83,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Update Lambda Configuration') {
+            when { expression{ return params.blUpdateLambdaConf } }
+            steps{
+                echo 'Create a deployment package && Update the Lambda function'
+                withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
+                    sh '''
+                       aws lambda update-function-configuration --function-name $lambdaName \
+                        --handler $newHandler 
+                    '''
+                }
+            }
+        }
+
         stage('Test Lambda') {
             when { expression{ return params.blTestLambda } }
             steps{
