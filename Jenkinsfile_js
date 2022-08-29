@@ -39,6 +39,12 @@ pipeline {
                         --role-name ${lambdaRole} \
                         --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
                     """
+                    //  Attach AmazonDynamoDBFullAccess policy to role
+                    sh """
+                        aws iam attach-role-policy \
+                        --role-name ${lambdaRole} \
+                        --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+                    """
                     sleep 15
                 }
             }
