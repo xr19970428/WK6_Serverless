@@ -35,21 +35,22 @@ pipeline {
                         --role-name ${lambdaRole} \
                         --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
                     """
+                    sleep 15
                 }
             }
         }
-        stage('Wait Role Creation') {
+/*        stage('Wait Role Creation') {
             steps{
                 echo "Waiting for ${lambdaRole} Creation"
                 //The input can also be replaced by sleep
-                /*script {
+                script {
                     timeout(time: 20, unit: 'SECONDS') {
                             input "Should we continue to create lambda?"
                     }
-                }*/
-                sleep 15
+                }
             }
         }
+*/
         stage('Create Lambda') {
             when { expression{ return params.blCreateLambda } }
             steps{
