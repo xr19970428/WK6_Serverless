@@ -17,48 +17,47 @@ exports.handler = async (event) => {
     let responseCode = 200;
     console.log("request: " + JSON.stringify(event));
 
-/*    if (event.queryStringParameters && event.queryStringParameters.name) {
-        console.log("Received name: " + event.queryStringParameters.name);
-        name = event.queryStringParameters.name;
-    }
+    /*    if (event.queryStringParameters && event.queryStringParameters.name) {
+            console.log("Received name: " + event.queryStringParameters.name);
+            name = event.queryStringParameters.name;
+        }
 
-    if (event.queryStringParameters && event.queryStringParameters.city) {
-        console.log("Received city: " + event.queryStringParameters.city);
-        city = event.queryStringParameters.city;
-    }
+        if (event.queryStringParameters && event.queryStringParameters.city) {
+            console.log("Received city: " + event.queryStringParameters.city);
+            city = event.queryStringParameters.city;
+        }
 
-    if (event.headers && event.headers['day']) {
-        console.log("Received day: " + event.headers.day);
-        day = event.headers.day;
-    }
-*/
+        if (event.headers && event.headers['day']) {
+            console.log("Received day: " + event.headers.day);
+            day = event.headers.day;
+        }
+    */
 
     //1.1 all four attributes passed in from API call body, and not query parameter or header.
     if (event.body) {
         let body = JSON.parse(event.body)
         if (body.name)
             name = body.name;
-        else {
-            let response = {
-                statusCode: "406",
-                headers: {
-                    "x-custom-header" : "my custom header value"
-                },
-                body: JSON.stringify({
-                    message: "Missing name",
-                    input: event
-                })
-            };
-        }
-
-        console.log("response: " + JSON.stringify(response))
+        else
+            throw Error ('Missing name')
 
         if (body.city)
             city = body.city;
+        else
+            throw Error ('Missing city')
+
         if (body.day)
             day = body.day;
+        else
+            day = new Date(new Date().toLocaleString('en-us', {timeZone: 'Australia/Brisbane'})).toLocaleString('en-us',{weekday:'long'})
+
         if (body.time)
             time = body.time;
+        else {
+            time = new Date(new Date().toLocaleString('en-us', {timeZone: 'Australia/Brisbane'})).getHours()
+            time = `${time} o'clock`
+        }
+
     }
 
     let greeting = `Good ${time}, ${name} of ${city}.`;
@@ -87,6 +86,7 @@ exports.handler = async (event) => {
     let params = {
         TableName: 'HelloWorldTable',
         Item: {
+            'id': {N: new Date().valueOf().toString()},
             'name' : {S: name},
             'city' : {S: city}
         }
