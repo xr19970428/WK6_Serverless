@@ -13,10 +13,10 @@ pipeline {
     parameters {
          booleanParam defaultValue:false,name:'blCreateIAMRole'
          booleanParam defaultValue:false,name:'blCreateLambda'
+         booleanParam defaultValue:false,name:'blUpdateLambda'
          booleanParam defaultValue:false,name:'blTestLambda'
          booleanParam defaultValue:false,name:'blDeleteLambda'
-
-    }       
+    }
 
     stages {
         stage('Create Role') {
@@ -62,6 +62,20 @@ pipeline {
                         --zip-file fileb://function.zip --handler $lambdaHandler --runtime $lambdaRuntime \
                         --role arn:aws:iam::$accountID:role/$lambdaRole
 
+                    '''
+                }
+            }
+        }
+        stage('Update Lambda') {
+            when { expression{ return params.blUpdateLambda } }
+            steps{
+                echo 'Create a deployment package && Update the Lambda function'
+                withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
+                    sh '''
+                       zip function.zip $lambdaFileName
+                       
+                       aws lambda update-function-code --function-name $lambdaName \
+                        --zip-file fileb://function.zip 
                     '''
                 }
             }
