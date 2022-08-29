@@ -5,8 +5,6 @@ pipeline {
         lambdaRole      = "GetStartedLambdaBasicExecutionRole"
         lambdaName      = "GetStartedLambdaProxyIntegration"
         lambdaFileName  = "*.js"
-        lambdaHandler   = "index.handler"
-        newHandler      = "index_dynamodb.handler"
         lambdaRuntime   = "nodejs16.x"
         accountID       = "402117963536"
         dynamoTable     = "HelloWorldTable"
@@ -15,11 +13,12 @@ pipeline {
     parameters {
          booleanParam defaultValue:false,name:'blCreateIAMRole'
          booleanParam defaultValue:false,name:'blCreateLambda'
-        booleanParam defaultValue:false,name:'blCreateDynamo'
+         booleanParam defaultValue:false,name:'blCreateDynamo'
          booleanParam defaultValue:false,name:'blUpdateLambdaCode'
          booleanParam defaultValue:false,name:'blUpdateLambdaConf'
          booleanParam defaultValue:false,name:'blTestLambda'
          booleanParam defaultValue:false,name:'blDeleteLambda'
+         string defaultValue: 'index.handler', name: 'lambdaHandler', trim: true
     }
 
     stages {
@@ -70,7 +69,7 @@ pipeline {
                        zip function.zip $lambdaFileName
                        
                        aws lambda create-function --function-name $lambdaName \
-                        --zip-file fileb://function.zip --handler $lambdaHandler --runtime $lambdaRuntime \
+                        --zip-file fileb://function.zip --handler $params.lambdaHandler --runtime $lambdaRuntime \
                         --role arn:aws:iam::$accountID:role/$lambdaRole
 
                     '''
@@ -99,7 +98,7 @@ pipeline {
                 withAWS(credentials: 'AWS_JR8', region: 'ap-southeast-2') {
                     sh '''
                        aws lambda update-function-configuration --function-name $lambdaName \
-                        --handler $newHandler 
+                        --handler $params.lambdaHandler 
                     '''
                 }
             }

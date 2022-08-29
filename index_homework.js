@@ -1,5 +1,3 @@
-'use strict';
-console.log('Loading hello world function');
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'ap-southeast-2'})
@@ -7,6 +5,9 @@ AWS.config.update({region: 'ap-southeast-2'})
 
 // Create the DynamoDB service object
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+'use strict';
+console.log('Loading hello world function');
+
 
 exports.handler = async (event) => {
     let name = "you";
@@ -16,7 +17,7 @@ exports.handler = async (event) => {
     let responseCode = 200;
     console.log("request: " + JSON.stringify(event));
 
-    if (event.queryStringParameters && event.queryStringParameters.name) {
+/*    if (event.queryStringParameters && event.queryStringParameters.name) {
         console.log("Received name: " + event.queryStringParameters.name);
         name = event.queryStringParameters.name;
     }
@@ -30,9 +31,32 @@ exports.handler = async (event) => {
         console.log("Received day: " + event.headers.day);
         day = event.headers.day;
     }
+*/
 
+    //1.1 all four attributes passed in from API call body, and not query parameter or header.
     if (event.body) {
         let body = JSON.parse(event.body)
+        if (body.name)
+            name = body.name;
+        else {
+            let response = {
+                statusCode: "406",
+                headers: {
+                    "x-custom-header" : "my custom header value"
+                },
+                body: JSON.stringify({
+                    message: "Missing name",
+                    input: event
+                })
+            };
+        }
+
+        console.log("response: " + JSON.stringify(response))
+
+        if (body.city)
+            city = body.city;
+        if (body.day)
+            day = body.day;
         if (body.time)
             time = body.time;
     }

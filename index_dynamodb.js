@@ -1,5 +1,3 @@
-'use strict';
-console.log('Loading hello world function');
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'ap-southeast-2'})
@@ -7,6 +5,9 @@ AWS.config.update({region: 'ap-southeast-2'})
 
 // Create the DynamoDB service object
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+'use strict';
+console.log('Loading hello world function');
+
 
 exports.handler = async (event) => {
     let name = "you";
