@@ -10,7 +10,7 @@ RESOURCE2_PATH=lookup
 echo 1. Creating REST API
 aws apigateway create-rest-api --name $API_NAME --endpoint-configuration types=REGIONAL --region $AWS_REGION
 
-echo 2. Creating /helloworld & /lookup resource
+echo 2. Creating /helloworld AND /lookup resource
 API_ID=$(aws apigateway get-rest-apis --region $AWS_REGION --query 'items[?name==`'"$API_NAME"'`]' | jq --raw-output '.[0] .id')
 #echo $API_ID
 ROOT_ID=$(aws apigateway get-resources --region $AWS_REGION --rest-api-id $API_ID | jq --raw-output '.items[0] .id')
@@ -18,7 +18,8 @@ aws apigateway create-resource --rest-api-id  $API_ID --parent-id $ROOT_ID --pat
 aws apigateway create-resource --rest-api-id  $API_ID --parent-id $ROOT_ID --path-part $RESOURCE2_PATH --region $AWS_REGION
 
 echo 3. Grant invoke permission to lambda
-aws lambda remove-permission --function-name $FUNCTION_NAME --statement-id $STATEMENT_ID --region $AWS_REGION
+aws lambda remove-permission --function-name $FUNCTION_NAME --statement-id $STATEMENT1_ID --region $AWS_REGION
+aws lambda remove-permission --function-name $FUNCTION_NAME --statement-id $STATEMENT2_ID --region $AWS_REGION
 aws lambda add-permission \
     --function-name $FUNCTION_NAME \
     --statement-id $STATEMENT1_ID \
@@ -41,7 +42,7 @@ LOOKUP_ID=$(aws apigateway get-resources --rest-api-id $API_ID --region $AWS_REG
 aws apigateway put-method --rest-api-id  $API_ID --resource-id  $LOOKUP_ID --http-method  GET --authorization-type "NONE" --region $AWS_REGION
 
 
-echo 5. Add method response to /helloworld ANY method & /lookup GET
+echo 5. Add method response to /helloworld ANY method AND  /lookup GET
 aws apigateway put-method-response  --rest-api-id  $API_ID --resource-id  $HELLO_ID --http-method  ANY \
         --response-models application/json=Empty \
         --status-code 200 --region $AWS_REGION
@@ -57,7 +58,7 @@ aws apigateway put-integration --rest-api-id  $API_ID --resource-id  $LOOKUP_ID 
         --type AWS_PROXY --integration-http-method POST  --region $AWS_REGION \
         --uri "arn:aws:apigateway:$AWS_REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$AWS_REGION:$AWS_ACCOUNT_ID:function:$FUNCTION_NAME/invocations"
 
-echo 7. Put integration response for /helloworld & /lookup
+echo 7. Put integration response for /helloworld AND /lookup
 aws apigateway put-integration-response --rest-api-id  $API_ID --resource-id  $HELLO_ID --http-method  ANY --status-code 200 --region $AWS_REGION
 aws apigateway put-integration-response --rest-api-id  $API_ID --resource-id  $LOOKUP_ID --http-method GET --status-code 200 --region $AWS_REGION
 
