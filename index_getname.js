@@ -37,7 +37,7 @@ exports.handler = async (event) => {
                 S: name
             }
         },
-        FilterExpression: "name = :a",
+        FilterExpression: "#NM = :a",
         ProjectionExpression: "#NM",
         TableName: "HelloWorldTable"
     };
