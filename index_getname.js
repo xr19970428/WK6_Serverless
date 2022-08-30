@@ -27,6 +27,11 @@ exports.handler = async (event) => {
             return response
         }
     }
+    else {
+        response.statusCode = 400
+        response.body = "Must have body"
+        return response
+    }
 
     var params = {
         ExpressionAttributeNames: {
@@ -45,4 +50,7 @@ exports.handler = async (event) => {
         if (err) console.log(err, err.stack); // an error occurred
         else console.log(data);
     }).promise();
+
+    response.body = JSON.stringify(ddbResponse)
+    return response;
 }
