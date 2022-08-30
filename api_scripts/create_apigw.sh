@@ -5,8 +5,10 @@ AWS_ACCOUNT_ID=402117963536
 AWS_REGION=ap-southeast-2
 STATEMENT1_ID=hello-apigateway-invoke-permissions
 STATEMENT2_ID=lookup-apigateway-invoke-permissions
+STATEMENT3_ID=register-apigateway-invoke-permissions
 RESOURCE1_PATH=helloworld
 RESOURCE2_PATH=lookup
+RESOURCE3_PATH=register
 echo 1. Creating REST API
 aws apigateway create-rest-api --name $API_NAME --endpoint-configuration types=REGIONAL --region $AWS_REGION
 
@@ -20,6 +22,7 @@ aws apigateway create-resource --rest-api-id  $API_ID --parent-id $ROOT_ID --pat
 echo 3. Grant invoke permission to lambda
 aws lambda remove-permission --function-name $FUNCTION_NAME --statement-id $STATEMENT1_ID --region $AWS_REGION
 aws lambda remove-permission --function-name $FUNCTION_NAME --statement-id $STATEMENT2_ID --region $AWS_REGION
+aws lambda remove-permission --function-name $FUNCTION_NAME --statement-id $STATEMENT3_ID --region $AWS_REGION
 aws lambda add-permission \
     --function-name $FUNCTION_NAME \
     --statement-id $STATEMENT1_ID \
@@ -33,6 +36,13 @@ aws lambda add-permission \
     --action lambda:InvokeFunction \
     --principal apigateway.amazonaws.com \
     --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$API_ID/*/*/$RESOURCE2_PATH" \
+    --region $AWS_REGION
+aws lambda add-permission \
+    --function-name $FUNCTION_NAME \
+    --statement-id $STATEMENT3_ID \
+    --action lambda:InvokeFunction \
+    --principal apigateway.amazonaws.com \
+    --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$API_ID/*/*/$RESOURCE3_PATH" \
     --region $AWS_REGION
 
 echo 4. Create ANY method to /helloworld and GET to /lookup
