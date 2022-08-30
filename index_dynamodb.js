@@ -64,6 +64,7 @@ exports.handler = async (event) => {
     let params = {
         TableName: 'HelloWorldTable',
         Item: {
+            'id': {N: new Date().valueOf().toString()},
             'name' : {S: name},
             'city' : {S: city}
         }
