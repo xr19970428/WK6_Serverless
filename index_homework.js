@@ -70,7 +70,11 @@ exports.handler = async (event) => {
             time = new Date(new Date().toLocaleString('en-us', {timeZone: 'Australia/Brisbane'})).getHours()
             time = `${time} o'clock`
         }
-
+    }
+    else {
+        response.statusCode = 400
+        response.body = "Must have body"
+        return response
     }
 
     let greeting = `Good ${time}, ${name} of ${city}.`;
